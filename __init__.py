@@ -1,6 +1,6 @@
 import bpy
 
-from .screen_capture import ScreenCapture
+from .window_capture import WindowCapture
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ from .screen_capture import ScreenCapture
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 bl_info = {
-    "name": "ScreenCapture",
+    "name": "WindowCapture",
     "author": "Yusuke Sanekata",
     "description": "",
     "blender": (2, 80, 0),
@@ -29,9 +29,9 @@ bl_info = {
 INTERVAL = 0.25
 
 # https://colorful-pico.net/introduction-to-addon-development-in-blender/2.8/html/chapter_03/03_Handle_Timer_Event.html
-class ScreenCaptureOperator(bpy.types.Operator):
-    bl_idname = "object.screencapture"
-    bl_label = "ScreenCapture"
+class WindowCaptureOperator(bpy.types.Operator):
+    bl_idname = "object.windowcapture"
+    bl_label = "WindowCapture"
 
     __timer = None
     __cap = None
@@ -42,17 +42,17 @@ class ScreenCaptureOperator(bpy.types.Operator):
 
     def __handle_add(self, context):
         if not self.is_running():
-            ScreenCaptureOperator.__timer = context.window_manager.event_timer_add(
+            WindowCaptureOperator.__timer = context.window_manager.event_timer_add(
                 INTERVAL, window=context.window
             )
-            ScreenCaptureOperator.__cap = ScreenCapture()
+            WindowCaptureOperator.__cap = WindowCapture()
             context.window_manager.modal_handler_add(self)
 
     def __handle_remove(self, context):
         if self.is_running():
-            context.window_manager.event_timer_remove(ScreenCaptureOperator.__timer)
-            ScreenCaptureOperator.__timer = None
-            ScreenCaptureOperator.__cap = None
+            context.window_manager.event_timer_remove(WindowCaptureOperator.__timer)
+            WindowCaptureOperator.__timer = None
+            WindowCaptureOperator.__cap = None
 
     def modal(self, context, event):
         if context.area:
@@ -65,11 +65,11 @@ class ScreenCaptureOperator(bpy.types.Operator):
 
         if event.type == "TIMER":
             # メイン処理
-            ScreenCaptureOperator.__cap.capture(event.mouse_x, event.mouse_y)
+            WindowCaptureOperator.__cap.capture(event.mouse_x, event.mouse_y)
         return {"PASS_THROUGH"}
 
     def invoke(self, context, event):
-        if not ScreenCaptureOperator.is_running():
+        if not WindowCaptureOperator.is_running():
             # 初期化処理
             self.__handle_add(context)
             return {"RUNNING_MODAL"}
@@ -78,19 +78,19 @@ class ScreenCaptureOperator(bpy.types.Operator):
         return {"FINISHED"}
 
 class UIPanel(bpy.types.Panel):
-    bl_label = "ScreenCapture"
+    bl_label = "WindowCapture"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 
     def draw(self, context):
         layout = self.layout
-        if not ScreenCaptureOperator.is_running():
-            layout.operator(ScreenCaptureOperator.bl_idname, text="start", icon="PLAY")
+        if not WindowCaptureOperator.is_running():
+            layout.operator(WindowCaptureOperator.bl_idname, text="start", icon="PLAY")
         else:
-            layout.operator(ScreenCaptureOperator.bl_idname, text="end", icon="PAUSE")
+            layout.operator(WindowCaptureOperator.bl_idname, text="end", icon="PAUSE")
 
 classes = [
-    ScreenCaptureOperator,
+    WindowCaptureOperator,
     UIPanel,
 ]
 

@@ -69,8 +69,8 @@ def draw_cursor(image, x, y):
     image.pixels[index + 3] = 1.0
 
 
-class ScreenCapture:
-    def __init__(self, image_name="ScreenCapture"):
+class WindowCapture:
+    def __init__(self, image_name="WindowCapture"):
         self.image_name = image_name
         self.width = 0
         self.height = 0
